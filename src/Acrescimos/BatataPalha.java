@@ -20,7 +20,7 @@ public class BatataPalha extends Ingrediente{
         if(getAdicional() instanceof Pizza){
             return super.getPreco()+(BatataPalha.valor*2);
         } else{
-            return super.getPreco();
+            return super.getPreco()+BatataPalha.valor;
         }
     }
 }

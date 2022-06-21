@@ -20,7 +20,7 @@ public class Queijo extends Ingrediente{
         if(getAdicional() instanceof Pizza){
             return super.getPreco()+(Queijo.valor*2);
         } else{
-            return super.getPreco();
+            return super.getPreco()+Queijo.valor;
         }
     }
 }

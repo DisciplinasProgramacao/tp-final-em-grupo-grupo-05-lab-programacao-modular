@@ -20,7 +20,7 @@ public class Ovo extends Ingrediente{
         if(getAdicional() instanceof Pizza){
             return super.getPreco()+(Ovo.valor*2);
         } else{
-            return super.getPreco();
+            return super.getPreco()+Ovo.valor;
         }
     }
 }

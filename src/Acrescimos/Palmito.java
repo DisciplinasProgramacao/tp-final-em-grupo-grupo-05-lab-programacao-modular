@@ -20,7 +20,7 @@ public class Palmito extends Ingrediente{
         if(getAdicional() instanceof Pizza){
             return super.getPreco()+(Palmito.valor*2);
         } else{
-            return super.getPreco();
+            return super.getPreco()+Palmito.valor;
         }
     }
 }

@@ -20,7 +20,7 @@ public class Pepperoni extends Ingrediente{
         if(getAdicional() instanceof Pizza){
             return super.getPreco() + (Pepperoni.valor*2);
         } else{
-            return super.getPreco();
+            return super.getPreco()+Pepperoni.valor;
         }
     }
 }

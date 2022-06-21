@@ -20,7 +20,7 @@ public class Picles extends Ingrediente{
         if(getAdicional() instanceof Pizza){
             return super.getPreco()+(Picles.valor*2);
         } else{
-            return super.getPreco();
+            return super.getPreco()+Picles.valor;
         }
     }
 }

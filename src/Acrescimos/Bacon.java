@@ -20,7 +20,7 @@ public class Bacon extends Ingrediente{
         if(getAdicional() instanceof Pizza){
             return super.getPreco()+(Bacon.valor*2);
         } else{
-            return super.getPreco();
+            return super.getPreco()+Bacon.valor;
         }
     }
 }
