@@ -19,6 +19,10 @@ public abstract class Ingrediente implements Adicional{
             this.adicional = adicional;
         }
     }
+    /*Get*/
+    public Adicional getAdicional() {
+        return adicional;
+    }
     /*Métodos da interface adicional */
     @Override
     public String getDescricao() {
