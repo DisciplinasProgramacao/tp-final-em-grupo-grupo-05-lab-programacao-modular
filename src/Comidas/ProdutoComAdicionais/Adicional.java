@@ -1,5 +1,7 @@
 package Comidas.ProdutoComAdicionais;
 
+import java.text.NumberFormat;
+
 public class Adicional {
     private static final int QUANTIDADE_INICIAL = 1;
 
@@ -26,5 +28,12 @@ public class Adicional {
     public double obterValorAdicional() {
         double precoIngrediente = getIngrediente().getPreco();
         return precoIngrediente * getQuantidade();
+    }
+
+    @Override
+    public String toString() {
+        String tratarFormatoPreco = NumberFormat.getCurrencyInstance().format(obterValorAdicional());
+        String texto = "\nQuantidade: " + getQuantidade() + " - " + getIngrediente() + "\n VALOR ACRESCIMO: " + tratarFormatoPreco + "\n";
+        return texto;
     }
 }

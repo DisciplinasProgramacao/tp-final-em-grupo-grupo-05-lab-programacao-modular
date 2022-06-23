@@ -1,6 +1,7 @@
 import Bebidas.Bebida;
 import Bebidas.BebidaFactoryConcreto;
 import Bebidas.TipoBebida;
+import Comidas.ProdutoComAdicionais.Ingrediente;
 import Comidas.ProdutoComAdicionais.Sanduiche.Sanduiche;
 import Comidas.ProdutoComAdicionais.Sanduiche.SanduicheFactoryConcreto;
 
@@ -15,7 +16,12 @@ public class Aplicacao {
         Sanduiche sanduiche = sanduicheFactory.criarSanduiche(true);
         Sanduiche sanduiche2 = sanduicheFactory.criarSanduiche(false);
         
-        System.out.println(sanduiche.getPreco());
-        System.out.println(sanduiche2.getPreco());
+        sanduiche.adicionarIngrediente(Ingrediente.BACON);
+        sanduiche.adicionarIngrediente(Ingrediente.BACON);
+        sanduiche.adicionarIngrediente(Ingrediente.BATATA_PALHA);
+        sanduiche.adicionarIngrediente(Ingrediente.OVO);
+
+        
+        System.out.println(sanduiche.toString());
     }
 }

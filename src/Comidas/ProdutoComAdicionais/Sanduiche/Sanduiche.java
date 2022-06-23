@@ -1,5 +1,6 @@
 package Comidas.ProdutoComAdicionais.Sanduiche;
 
+import Comidas.ProdutoComAdicionais.Adicional;
 import Comidas.ProdutoComAdicionais.ProdutoComAdicionais;
 
 public class Sanduiche extends ProdutoComAdicionais {
@@ -23,5 +24,22 @@ public class Sanduiche extends ProdutoComAdicionais {
     public double getPreco() {
         double precoAdicionais = super.obterValorTotalAdicionais();
         return precoAdicionais + obterPrecoSanduiche();
+    }
+
+    public String obterTextoCasoExistaAdicionais() {
+        boolean existeAdicionais = super.existeAdicionais();
+        String textoExisteAdicionais = "\nADICIONAIS:";
+        String textoSemAdicionais = "Produto não contém nenhum ingrediente adicional";
+
+        for (Adicional adicional : getAdicionais()) {
+            textoExisteAdicionais += adicional.toString();
+        }
+
+        return existeAdicionais ? textoExisteAdicionais : textoSemAdicionais;
+    }
+
+    @Override
+    public String toString() {
+        return getDescricao() + ":\n" + obterTextoCasoExistaAdicionais();
     }
 }

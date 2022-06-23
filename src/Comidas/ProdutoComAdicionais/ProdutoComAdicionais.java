@@ -1,5 +1,6 @@
 package Comidas.ProdutoComAdicionais;
 
+import java.util.ArrayList;
 import java.util.List;
 import Restaurante.Produto;
 
@@ -8,11 +9,11 @@ public abstract class ProdutoComAdicionais extends Produto {
 
     protected ProdutoComAdicionais(String descricao, double preco) {
         super(descricao, preco);
+        adicionais = new ArrayList<Adicional>();
     }
 
     public void adicionarIngrediente(Ingrediente ingrediente) {
         Adicional adicionalJaExistente = obterAdicionalJaExistente(ingrediente);
-
         if (adicionalJaExistente != null) {
             adicionalJaExistente.aumentarQuantidadeIngrediente();
         }
@@ -38,5 +39,13 @@ public abstract class ProdutoComAdicionais extends Produto {
         return adicionais.stream()
             .mapToDouble((adicional) -> adicional.obterValorAdicional())
             .sum();
+    }
+
+    public List<Adicional> getAdicionais() {
+        return this.adicionais;
+    }
+
+    public boolean existeAdicionais() {
+        return !getAdicionais().isEmpty();
     }
 }
