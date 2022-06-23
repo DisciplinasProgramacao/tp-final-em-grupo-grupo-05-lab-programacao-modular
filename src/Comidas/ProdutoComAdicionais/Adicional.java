@@ -1,21 +1,30 @@
 package Comidas.ProdutoComAdicionais;
 
-public enum Adicional {
-    PEPPERONI(4),
-    PICLES(2),
-    QUEIJO(2),
-    BACON(3),
-    PALMITO(3),
-    OVO(2),
-    BATATA_PALHA(2);
+public class Adicional {
+    private static final int QUANTIDADE_INICIAL = 1;
 
-    private final double preco;
+    private Ingrediente ingrediente;
+    private int quantidade;
 
-    Adicional(double preco) {
-        this.preco = preco;
+    public Adicional(Ingrediente ingrediente) {
+        this.ingrediente = ingrediente;
+        this.quantidade = QUANTIDADE_INICIAL;
     }
 
-    public double getPreco() {
-        return this.preco;
+    public Ingrediente getIngrediente() {
+        return ingrediente;
+    }
+
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void aumentarQuantidadeIngrediente() {
+        this.quantidade++;
+    }
+
+    public double obterValorAdicional() {
+        double precoIngrediente = getIngrediente().getPreco();
+        return precoIngrediente * getQuantidade();
     }
 }
