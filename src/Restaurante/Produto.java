@@ -1,4 +1,4 @@
-package Produtos;
+package Restaurante;
 /*
  * Classe genérica para representar qualquer produto do restaurante que se tornará um item de pedido
  */
