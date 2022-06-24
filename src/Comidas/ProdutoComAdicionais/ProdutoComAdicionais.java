@@ -12,6 +12,10 @@ public abstract class ProdutoComAdicionais extends Produto {
         adicionais = new ArrayList<Adicional>();
     }
 
+    /**
+     * Adiciona ingrediente no produto
+     * @param ingrediente Ingrediente que deseja adicionar
+    */
     public void adicionarIngrediente(Ingrediente ingrediente) {
         Adicional adicionalJaExistente = obterAdicionalJaExistente(ingrediente);
         if (adicionalJaExistente != null) {
@@ -47,5 +51,27 @@ public abstract class ProdutoComAdicionais extends Produto {
 
     public boolean existeAdicionais() {
         return !getAdicionais().isEmpty();
+    }
+
+    private String obterTextoCasoExistaAdicionais() {
+        boolean existeAdicionais = existeAdicionais();
+        String textoExisteAdicionais = "\nADICIONAIS:";
+        String textoSemAdicionais = "Produto não contém nenhum ingrediente adicional";
+
+        for (Adicional adicional : getAdicionais()) {
+            textoExisteAdicionais += adicional.toString();
+        }
+
+        return existeAdicionais ? textoExisteAdicionais : textoSemAdicionais;
+    }
+
+    @Override
+    public double getPreco() {
+        return obterValorTotalAdicionais() + super.getPreco();
+    }
+
+    @Override
+    public String toString() {
+        return ":\n" + obterTextoCasoExistaAdicionais();
     }
 }

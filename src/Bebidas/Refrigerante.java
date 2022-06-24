@@ -1,7 +1,7 @@
 package Bebidas;
 
-class Refrigerante extends Bebida {
-    public Refrigerante(String descricao, double preco) {
+public class Refrigerante extends Bebida {
+    Refrigerante(String descricao, double preco) {
         super(descricao, preco);
     }
 }

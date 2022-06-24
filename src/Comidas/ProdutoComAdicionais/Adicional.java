@@ -33,7 +33,7 @@ public class Adicional {
     @Override
     public String toString() {
         String tratarFormatoPreco = NumberFormat.getCurrencyInstance().format(obterValorAdicional());
-        String texto = "\nQuantidade: " + getQuantidade() + " - " + getIngrediente() + "\n VALOR ACRESCIMO: " + tratarFormatoPreco + "\n";
+        String texto = "\nQuantidade: " + getQuantidade() + " - " + getIngrediente() + "\nVALOR TOTAL DO ACRESCIMO: " + tratarFormatoPreco + "\n";
         return texto;
     }
 }

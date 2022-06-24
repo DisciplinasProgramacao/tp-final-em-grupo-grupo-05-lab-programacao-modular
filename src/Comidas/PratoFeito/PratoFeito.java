@@ -1,9 +1,17 @@
 package Comidas.PratoFeito;
 
 import Restaurante.Produto;
+import Utils.StringUtils;
 
-class PratoFeito extends Produto {
-    protected PratoFeito(String descricao, double preco) {
+public class PratoFeito extends Produto {
+    PratoFeito(String descricao, double preco) {
         super(descricao, preco);
+    }
+
+    @Override
+    public String toString() {
+        String tratarFormatoPreco = StringUtils.formatarNumeroParaStringEmFormatoDeMoedaBrasileira(getPreco());
+        
+        return "\n" + tratarFormatoPreco + " - "+ getDescricao();
     }
 }
