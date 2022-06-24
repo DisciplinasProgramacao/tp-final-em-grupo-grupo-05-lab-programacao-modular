@@ -1,7 +1,12 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+
+import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -20,6 +25,8 @@ import Consumidor.Cliente;
 import Consumidor.ExcecaoCPFInvalido;
 import Consumidor.ExcecaoClienteJaExistente;
 import Consumidor.ExcecaoClienteNaoCadastrado;
+import Consumidor.RelatorioPedido;
+import Restaurante.ExcecaoPedidoInexistente;
 import Restaurante.Pedido;
 import Restaurante.Produto;
 
@@ -34,22 +41,26 @@ public class Aplicacao {
         PizzaFactoryConcreto pizzaFactory = new PizzaFactoryConcreto();
         SanduicheFactoryConcreto sanduicheFactory = new SanduicheFactoryConcreto();
         PratoFeitoFactoryConcreto pratoFeitoFactory = new PratoFeitoFactoryConcreto();
-
+        
+        // Inicializando classes com arquivo de texto
         List<Bebida> bebidas = alimentarClasseBebidaAtravesDeArquivoTexto(bebidaFactory);
         List<Pizza> pizzas = alimentarClassePizzaAtravesDeArquivoTexto(pizzaFactory);
         List<Sanduiche> sanduiches = alimentarClasseSanduicheAtravesDeArquivoTexto(sanduicheFactory);
         List<Cliente> clientes = alimentarClasseClienteAtravesDeArquivoDeTexto();
+        
+        List<Cliente> clientes = lerDadosArquivoBinario();
+        
 
         mostrarMenu(clientes, bebidaFactory, pizzaFactory, sanduicheFactory, pratoFeitoFactory);
     }
 
     /**
      * Mostar menu para a seleção de ações dentro do restaurante
-     * @param clientes Lista de clientes
-     * @param bebidaFactory
-     * @param pizzaFactory
-     * @param sanduicheFactory
-     * @param pratoFeitoFactory
+     * @param clientes Lista contendo todos os clientes do sistema
+     * @param bebidaFactory Factory de bebidas 
+     * @param pizzaFactory Factory de pizzas
+     * @param sanduicheFactory Factory de sanduíches
+     * @param pratoFeitoFactory Factory de prato feitos
      */
     public static void mostrarMenu(List<Cliente> clientes, BebidaFactoryConcreto bebidaFactory, PizzaFactoryConcreto pizzaFactory, SanduicheFactoryConcreto sanduicheFactory, PratoFeitoFactoryConcreto pratoFeitoFactory) {
         int opcao;
@@ -104,10 +115,15 @@ public class Aplicacao {
     }
 
     public static void salvarDadosEmBinario(List<Cliente> clientes) {
-        for(Cliente cliente : clientes) {
-            cliente.salvarClienteEmBinario();
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/ArquivosBinarios/clientes.bin"));
+            oos.writeObject(clientes);
+            oos.close();
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar binário do objeto");
         }
     }
+
 
     public static void fazerPedido(BebidaFactoryConcreto bebidaFactory, PratoFeitoFactoryConcreto pratoFeitoFactory, PizzaFactoryConcreto pizzaFactory, SanduicheFactoryConcreto sanduicheFactory, List<Cliente> clientes) {
         try {
@@ -129,7 +145,7 @@ public class Aplicacao {
     }
 
     public static void mostrarProdutos(BebidaFactoryConcreto bebidaFactory, PratoFeitoFactoryConcreto pratoFeitoFactory, PizzaFactoryConcreto pizzaFactory, SanduicheFactoryConcreto sanduicheFactory,List<Produto> produtos, List<Cliente> clientes) {
-        System.out.println("Qual tipo de produto você deseja adicionar no pedido?");
+        System.out.println("Qual tipo de produto você deseja adicionar no pedido?\n");
 
         int opcao;
         Scanner sc = new Scanner(System.in);
@@ -141,13 +157,13 @@ public class Aplicacao {
             System.out.println("[4] Sanduíche");
             System.out.println("[0] Finalizar pedido");
 
-            System.out.print("Digite sua opção: ");
+            System.out.print("\nDigite sua opção: ");
 
             opcao = sc.nextInt();
             
             switch (opcao) {
                 case 1:
-                    mostrarBebidas(bebidaFactory,produtos, clientes);
+                    cadastrarBebidas(bebidaFactory,produtos, clientes);
                     break;
                 case 2:
                     cadastrarPratoFeito(pratoFeitoFactory,produtos, clientes);
@@ -279,10 +295,10 @@ public class Aplicacao {
     public static void cadastrarPratoFeito(PratoFeitoFactoryConcreto pratoFeitoFactory, List<Produto> produtos, List<Cliente> clientes) {
         PratoFeito pratoFeito = pratoFeitoFactory.criarPratoFeito();
         produtos.add(pratoFeito);
-        System.out.println("Prato feito adicionado com sucesso");
+        System.out.println("\nPrato feito adicionado com sucesso\n");
     }
 
-    public static void mostrarBebidas(BebidaFactoryConcreto bebidaFactory, List<Produto> produtos, List<Cliente> clientes) {
+    public static void cadastrarBebidas(BebidaFactoryConcreto bebidaFactory, List<Produto> produtos, List<Cliente> clientes) {
         int opcao;
         Scanner sc = new Scanner(System.in);
         
@@ -351,13 +367,57 @@ public class Aplicacao {
                     break;
                 case 3:
                     gerarAvaliacaoMediaDePedidos(clientes);
+                    break;
+                case 4:
+                    gerarRelatorioDeUmPedido(clientes);
+                    break;
+                case 5:
+                    gerarRelatorioDeTodosOsPedidos(clientes);
+                    break;
                 default:
                     break;
             }
         } while (opcao != 0);
     }
-
     
+    private static void gerarRelatorioDeTodosOsPedidos(List<Cliente> clientes) {
+        try {
+            Cliente cliente = executarLoginDoUsuario(clientes);
+
+            RelatorioPedido.getInstancia().solicitarExtratoPedidoTodosOsPedidos(cliente);
+        }
+        catch (ExcecaoClienteNaoCadastrado e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private static void gerarRelatorioDeUmPedido(List<Cliente> clientes) {
+        try {
+            Cliente cliente = executarLoginDoUsuario(clientes);
+            Pedido pedido = encontrarPedidoAtravesDoId(cliente.getPedidos());
+
+            RelatorioPedido.getInstancia().solicitarExtratoPedidoEspecifico(cliente, pedido);
+        }
+        catch (ExcecaoClienteNaoCadastrado | ExcecaoPedidoInexistente e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private static Pedido encontrarPedidoAtravesDoId(List<Pedido> pedidos) throws ExcecaoPedidoInexistente {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Digite o número do id para encontrar o pedido:");
+        int id = sc.nextInt();
+
+        Pedido pedidoEncontrado = pedidos.stream().filter((pedido) -> Pedido.getId() == id).findFirst().orElse(null);
+
+        if (pedidoEncontrado != null) {
+            return pedidoEncontrado;
+        }
+        else {
+            throw new ExcecaoPedidoInexistente();
+        }
+    }
+
     private static void gerarAvaliacaoMediaDePedidos(List<Cliente> clientes) {
         try {
             Cliente cliente = executarLoginDoUsuario(clientes);
@@ -371,11 +431,12 @@ public class Aplicacao {
 
     public static Cliente executarLoginDoUsuario(List<Cliente> clientes) throws ExcecaoClienteNaoCadastrado{
         Scanner sc = new Scanner(System.in);
-        System.out.println("Digite o CPF do cliente para começar a fazer o pedido:");
+        System.out.println("\nDigite o CPF do cliente para começar a fazer o pedido:");
         String cpf = sc.nextLine();
         Cliente cliente = encontrarClientePorCPFOuNome(clientes, cpf);
 
         if (cliente != null) {
+            System.out.println("\nSeja bem vindo, " + cliente.getNome() + "!\n");
             return cliente;
         }
         else {

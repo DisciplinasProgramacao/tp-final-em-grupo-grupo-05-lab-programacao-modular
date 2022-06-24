@@ -11,15 +11,24 @@ public class RelatorioPedido {
         return INSTANCIA;
     } 
 
-    public void solicitarExtratoPedidoEspecifico(Pedido pedido) {
-        System.out.println("Relatório pedido:\n");
-        System.out.println(pedido.toString());
+    public void solicitarExtratoPedidoEspecifico(Cliente cliente, Pedido pedido) {
+        try {
+            if (cliente.equals(pedido.getCliente())) {
+                System.out.println("Relatório pedido:\n");
+                System.out.println(pedido.toString());
+            }
+            else {
+                throw new ExcecaoPermissaoNegada();
+            }
+        } catch (ExcecaoPermissaoNegada e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     
     public void solicitarExtratoPedidoTodosOsPedidos(Cliente cliente) {
         for(Pedido pedido : cliente.getPedidos()) {
-            solicitarExtratoPedidoEspecifico(pedido);
+            solicitarExtratoPedidoEspecifico(cliente, pedido);
         }
     }
 }

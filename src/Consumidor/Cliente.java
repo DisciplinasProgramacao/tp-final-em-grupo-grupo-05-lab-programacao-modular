@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-
 import Restaurante.Pedido;
 
 public class Cliente implements Serializable {
     List<Pedido> pedidos;
     Fidelidade fidelidade;
     String nome;
+
     public String getNome() {
         return nome;
     }
@@ -55,7 +55,7 @@ public class Cliente implements Serializable {
         
         obterDescontoNoPedidoPorFidelidade(pedido);
         avaliarPedido(pedido);
-        RelatorioPedido.getInstancia().solicitarExtratoPedidoEspecifico(pedido);
+        RelatorioPedido.getInstancia().solicitarExtratoPedidoEspecifico(this, pedido);
 
         pedidos.add(pedido);
     }
@@ -88,16 +88,6 @@ public class Cliente implements Serializable {
         return pedido;
     }
 
-    public void salvarClienteEmBinario() {
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/ArquivosBinarios/clientes.bin", true));
-            oos.writeObject(this);
-            oos.close();
-        } catch (IOException e) {
-            System.err.println("Erro ao salvar binário do objeto");
-        }
-    }
-    
     public double obterAvaliacaoMedia() {
         return pedidos.stream()
             .mapToDouble((pedido) -> pedido.getAvaliacao())

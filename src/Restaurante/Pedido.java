@@ -1,12 +1,13 @@
 package Restaurante;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import Consumidor.Cliente;
 import Utils.StringUtils;
 
-public class Pedido {
+public class Pedido implements Serializable {
     private List<Produto> produtos;
     private int avaliacao;
 
@@ -60,13 +61,13 @@ public class Pedido {
     @Override
     public String toString() {
         String valorTotalPedidoFormatado = StringUtils.formatarNumeroParaStringEmFormatoDeMoedaBrasileira(getValorTotalPedido());
-        String texto = "***************\nPedido N°" + getId() + " feito por " + getCliente().getNome() + "\n\nPRODUTOS DO PEDIDO:\n";
+        String texto = "*****************\n\nPedido N°" + getId() + " feito por " + getCliente().getNome() + "\n\nPRODUTOS DO PEDIDO:\n";
 
         for (Produto produto : produtos) {
             texto += "\n-------------------------------\n" + produto.toString() + "\n";
         }
 
-        texto+= "\nVALOR TOTAL DO PEDIDO: " + valorTotalPedidoFormatado + "\n";
+        texto+= "\nVALOR TOTAL DO PEDIDO: " + valorTotalPedidoFormatado + "\n\n";
         texto += "\n***************";
 
         return texto;
