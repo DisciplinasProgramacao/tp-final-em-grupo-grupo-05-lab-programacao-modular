@@ -20,6 +20,10 @@ public class Pedido implements Serializable {
     private LocalDateTime dataRealizacao;
     private double valorComDesconto;
 
+    public double getValorComDesconto() {
+        return valorComDesconto;
+    }
+
     public Pedido(List<Produto> produtos, Cliente cliente) {
         Pedido.id++;
         this.cliente = cliente;
@@ -61,6 +65,8 @@ public class Pedido implements Serializable {
     @Override
     public String toString() {
         String valorTotalPedidoFormatado = StringUtils.formatarNumeroParaStringEmFormatoDeMoedaBrasileira(getValorTotalPedido());
+        String valorFinalPedidoComDescontoFormatado = StringUtils.formatarNumeroParaStringEmFormatoDeMoedaBrasileira(getValorComDesconto());
+
         String texto = "*****************\n\nPedido N°" + getId() + " feito por " + getCliente().getNome() + "\n\nPRODUTOS DO PEDIDO:\n";
 
         for (Produto produto : produtos) {
@@ -68,6 +74,8 @@ public class Pedido implements Serializable {
         }
 
         texto+= "\nVALOR TOTAL DO PEDIDO: " + valorTotalPedidoFormatado + "\n\n";
+        texto+= "\nVALOR FINAL COM DESCONTO: " + valorFinalPedidoComDescontoFormatado + "\n\n";
+
         texto += "\n***************";
 
         return texto;

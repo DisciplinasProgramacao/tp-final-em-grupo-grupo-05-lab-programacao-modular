@@ -1,7 +1,5 @@
 package Comidas.ProdutoComAdicionais.Sanduiche;
 
-import java.text.NumberFormat;
-
 import Comidas.ProdutoComAdicionais.ProdutoComAdicionais;
 import Utils.StringUtils;
 

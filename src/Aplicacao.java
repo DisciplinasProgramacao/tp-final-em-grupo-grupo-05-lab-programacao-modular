@@ -1,16 +1,9 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import Arquivos.ArquivosBinarios;
+import Arquivos.ArquivosTexto;
 import Bebidas.Bebida;
 import Bebidas.BebidaFactoryConcreto;
 import Bebidas.TipoBebida;
@@ -26,15 +19,12 @@ import Consumidor.ExcecaoCPFInvalido;
 import Consumidor.ExcecaoClienteJaExistente;
 import Consumidor.ExcecaoClienteNaoCadastrado;
 import Consumidor.RelatorioPedido;
+import Restaurante.ExcecaoForaDoLimiteDeProdutos;
 import Restaurante.ExcecaoPedidoInexistente;
 import Restaurante.Pedido;
 import Restaurante.Produto;
 
 public class Aplicacao {
-    private static final String caminhoArquivoBebidas = "src/ArquivosTexto/bebidas.txt";
-    private static final String caminhoArquivoProdutosAdicionais = "src/ArquivosTexto/produtosAdicionais.txt";
-    private static final String caminhoArquivoClientes = "src/ArquivosTexto/clientes.txt";
-
 
     public static void main(String[] args) {
         BebidaFactoryConcreto bebidaFactory = new BebidaFactoryConcreto();
@@ -43,13 +33,15 @@ public class Aplicacao {
         PratoFeitoFactoryConcreto pratoFeitoFactory = new PratoFeitoFactoryConcreto();
         
         // Inicializando classes com arquivo de texto
-        List<Bebida> bebidas = alimentarClasseBebidaAtravesDeArquivoTexto(bebidaFactory);
-        List<Pizza> pizzas = alimentarClassePizzaAtravesDeArquivoTexto(pizzaFactory);
-        List<Sanduiche> sanduiches = alimentarClasseSanduicheAtravesDeArquivoTexto(sanduicheFactory);
-        List<Cliente> clientes = alimentarClasseClienteAtravesDeArquivoDeTexto();
+        // ArquivosTexto arquivosTexto = ArquivosTexto.getInstancia();
+
+        // List<Bebida> bebidas = arquivosTexto.obterBebidas(bebidaFactory);
+        // List<Pizza> pizzas = arquivosTexto.obterPizzas(pizzaFactory);
+        // List<Sanduiche> sanduiches = arquivosTexto.obterSanduiches(sanduicheFactory);
+        // List<Cliente> clientes = arquivosTexto.obterClientes();
         
-        List<Cliente> clientes = lerDadosArquivoBinario();
-        
+        // Inicializando classe com arquivo binário
+        List<Cliente> clientes = ArquivosBinarios.getInstancia().lerDadosArquivoBinario();
 
         mostrarMenu(clientes, bebidaFactory, pizzaFactory, sanduicheFactory, pratoFeitoFactory);
     }
@@ -84,7 +76,7 @@ public class Aplicacao {
             }
         } while (opcao != 0);
 
-        salvarDadosEmBinario(clientes);
+        ArquivosBinarios.getInstancia().salvarDadosEmBinario(clientes);
     }
 
     public static void cadastrarCliente(List<Cliente> clientes, BebidaFactoryConcreto bebidaFactory, PizzaFactoryConcreto pizzaFactory, SanduicheFactoryConcreto sanduicheFactory, PratoFeitoFactoryConcreto pratoFeitoFactory) {
@@ -114,26 +106,23 @@ public class Aplicacao {
         mostrarMenuClientes(clientes, bebidaFactory, pratoFeitoFactory, sanduicheFactory, pizzaFactory );
     }
 
-    public static void salvarDadosEmBinario(List<Cliente> clientes) {
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/ArquivosBinarios/clientes.bin"));
-            oos.writeObject(clientes);
-            oos.close();
-        } catch (IOException e) {
-            System.err.println("Erro ao salvar binário do objeto");
-        }
-    }
-
-
     public static void fazerPedido(BebidaFactoryConcreto bebidaFactory, PratoFeitoFactoryConcreto pratoFeitoFactory, PizzaFactoryConcreto pizzaFactory, SanduicheFactoryConcreto sanduicheFactory, List<Cliente> clientes) {
         try {
             Cliente cliente = executarLoginDoUsuario(clientes);
             List<Produto> produtos = new ArrayList<Produto>();
             mostrarProdutos(bebidaFactory, pratoFeitoFactory, pizzaFactory, sanduicheFactory, produtos, clientes);
             
+            verificarSeEstaNoLimiteDeProdutosParaRealizarPedido(produtos);
+            
             cliente.realizarPedido(new Pedido(produtos, cliente));
-        } catch (ExcecaoClienteNaoCadastrado e) {
+        } catch (ExcecaoClienteNaoCadastrado | ExcecaoForaDoLimiteDeProdutos e) {
             System.err.println(e.getMessage());
+        }
+    }
+
+    public static void verificarSeEstaNoLimiteDeProdutosParaRealizarPedido(List<Produto> produtos) throws ExcecaoForaDoLimiteDeProdutos {
+        if (!(produtos.size() > 0 && produtos.size() <= 10)) {
+            throw new ExcecaoForaDoLimiteDeProdutos();
         }
     }
 
@@ -180,7 +169,7 @@ public class Aplicacao {
         } while (opcao != 0);
     }
 
-    private static void cadastrarSanduiche(SanduicheFactoryConcreto sanduicheFactory, List<Produto> produtos, List<Cliente> clientes) {
+    public static void cadastrarSanduiche(SanduicheFactoryConcreto sanduicheFactory, List<Produto> produtos, List<Cliente> clientes) {
         int opcao;
         Scanner sc = new Scanner(System.in);
         
@@ -287,7 +276,7 @@ public class Aplicacao {
         } while (opcao != 0);
     }
 
-    private static void adicionarIngrediente(Pizza pizza, Ingrediente ingrediente) {
+    public static void adicionarIngrediente(Pizza pizza, Ingrediente ingrediente) {
         pizza.adicionarIngrediente(ingrediente);
         System.out.println("\n " + ingrediente + " adicionado com sucesso\n");
     }
@@ -380,18 +369,18 @@ public class Aplicacao {
         } while (opcao != 0);
     }
     
-    private static void gerarRelatorioDeTodosOsPedidos(List<Cliente> clientes) {
+    public static void gerarRelatorioDeTodosOsPedidos(List<Cliente> clientes) {
         try {
             Cliente cliente = executarLoginDoUsuario(clientes);
 
-            RelatorioPedido.getInstancia().solicitarExtratoPedidoTodosOsPedidos(cliente);
+            RelatorioPedido.getInstancia().solicitarExtratoResumidoTodosOsPedidos(cliente);
         }
         catch (ExcecaoClienteNaoCadastrado e) {
             System.err.println(e.getMessage());
         }
     }
 
-    private static void gerarRelatorioDeUmPedido(List<Cliente> clientes) {
+    public static void gerarRelatorioDeUmPedido(List<Cliente> clientes) {
         try {
             Cliente cliente = executarLoginDoUsuario(clientes);
             Pedido pedido = encontrarPedidoAtravesDoId(cliente.getPedidos());
@@ -403,7 +392,7 @@ public class Aplicacao {
         }
     }
 
-    private static Pedido encontrarPedidoAtravesDoId(List<Pedido> pedidos) throws ExcecaoPedidoInexistente {
+    public static Pedido encontrarPedidoAtravesDoId(List<Pedido> pedidos) throws ExcecaoPedidoInexistente {
         Scanner sc = new Scanner(System.in);
         System.out.println("Digite o número do id para encontrar o pedido:");
         int id = sc.nextInt();
@@ -418,7 +407,7 @@ public class Aplicacao {
         }
     }
 
-    private static void gerarAvaliacaoMediaDePedidos(List<Cliente> clientes) {
+    public static void gerarAvaliacaoMediaDePedidos(List<Cliente> clientes) {
         try {
             Cliente cliente = executarLoginDoUsuario(clientes);
             double avaliacaoMedia = cliente.obterAvaliacaoMedia();
@@ -442,95 +431,5 @@ public class Aplicacao {
         else {
             throw new ExcecaoClienteNaoCadastrado();
         }
-    }
-
-    public static List<Bebida> alimentarClasseBebidaAtravesDeArquivoTexto(BebidaFactoryConcreto bebidaFactory) {
-        List<Bebida> bebidas = new ArrayList<Bebida>();
-
-        try {
-            Scanner sc = new Scanner(new File(caminhoArquivoBebidas));
-            
-            while (sc.hasNextLine()) {
-                String linha = sc.nextLine();
-                Bebida bebida = bebidaFactory.criarBebida(TipoBebida.valueOf(linha));
-                bebidas.add(bebida);
-            }
-
-            sc.close();
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("Arquivo não encontrado!");
-        }
-    
-        return bebidas;
-    }
-
-    public static List<Pizza> alimentarClassePizzaAtravesDeArquivoTexto(PizzaFactoryConcreto pizzaFactory) {
-        List<Pizza> pizzas = new ArrayList<Pizza>();
-        
-        try {
-            Scanner sc = new Scanner(new File(caminhoArquivoProdutosAdicionais));
-            
-            while (sc.hasNextLine()) {
-                boolean linha = sc.nextBoolean();
-                Pizza pizza = pizzaFactory.criarPizza(linha);
-                pizzas.add(pizza);
-            }
-
-            sc.close();
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("Arquivo não encontrado!");
-        }
-    
-        return pizzas;
-    }
-
-    public static List<Sanduiche> alimentarClasseSanduicheAtravesDeArquivoTexto(SanduicheFactoryConcreto sanduicheFactory) {
-        List<Sanduiche> sanduiches = new ArrayList<Sanduiche>();
-        
-        try {
-            Scanner sc = new Scanner(new File(caminhoArquivoProdutosAdicionais));
-            
-            while (sc.hasNextLine()) {
-                boolean linha = sc.nextBoolean();
-                Sanduiche sanduiche = sanduicheFactory.criarSanduiche(linha);
-                sanduiches.add(sanduiche);
-            }
-
-            sc.close();
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("Arquivo não encontrado!");
-        }
-    
-        return sanduiches;
-    }
-
-    public static List<Cliente> alimentarClasseClienteAtravesDeArquivoDeTexto() {
-        List<Cliente> clientes = new ArrayList<Cliente>();
-        
-        try {
-            Scanner sc = new Scanner(new File(caminhoArquivoClientes));
-            
-            while (sc.hasNextLine()) {
-                String linha = sc.nextLine();
-                String[] detalhes = linha.split(";");
-                String nome = detalhes[0];
-                String cpf = detalhes[1];
-                Cliente cliente = new Cliente(nome, cpf);
-                clientes.add(cliente);
-            }
-
-            sc.close();
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("Arquivo não encontrado!");
-        }
-        catch (ExcecaoCPFInvalido e) {
-            System.err.println(e.getMessage());
-        }
-    
-        return clientes;
     }
 }

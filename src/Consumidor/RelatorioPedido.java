@@ -1,6 +1,7 @@
 package Consumidor;
 
 import Restaurante.Pedido;
+import Utils.StringUtils;
 
 public class RelatorioPedido {
     private static final RelatorioPedido INSTANCIA = new RelatorioPedido();
@@ -24,11 +25,14 @@ public class RelatorioPedido {
             System.err.println(e.getMessage());
         }
     }
-
     
-    public void solicitarExtratoPedidoTodosOsPedidos(Cliente cliente) {
+    public void solicitarExtratoResumidoTodosOsPedidos(Cliente cliente) {
         for(Pedido pedido : cliente.getPedidos()) {
-            solicitarExtratoPedidoEspecifico(cliente, pedido);
+            System.out.println("Extrato pedido resumido:");
+            System.out.println("Pedido N°" + Pedido.getId());
+            System.out.println("Cliente:" + pedido.getCliente().getNome());
+            System.out.println("Data:" + StringUtils.formatarDataParaDdMmAAAA(pedido.getDataRealizacao()));
+            System.out.println("\n------------------------\n");
         }
     }
 }
