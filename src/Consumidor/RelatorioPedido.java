@@ -16,7 +16,7 @@ public class RelatorioPedido {
         try {
             if (cliente.equals(pedido.getCliente())) {
                 System.out.println("Relatório pedido:\n");
-                System.out.println(pedido.toString());
+                System.out.println(pedido.gerarNotaDeCompra());
             }
             else {
                 throw new ExcecaoPermissaoNegada();
@@ -27,6 +27,10 @@ public class RelatorioPedido {
     }
     
     public void solicitarExtratoResumidoTodosOsPedidos(Cliente cliente) {
+        if(cliente.getPedidos().size() == 0) {
+            System.out.println("Você não possui nenhum pedido ainda.");
+        }
+
         for(Pedido pedido : cliente.getPedidos()) {
             System.out.println("Extrato pedido resumido:");
             System.out.println("Pedido N°" + Pedido.getId());

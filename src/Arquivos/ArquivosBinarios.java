@@ -56,6 +56,7 @@ public class ArquivosBinarios  {
             oos.close();
         } catch (IOException e) {
             System.err.println("Erro ao salvar binário do objeto");
+            System.err.println(e.getMessage());
         }
     }
 

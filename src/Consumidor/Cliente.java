@@ -1,13 +1,11 @@
 package Consumidor;
 
-import java.io.ObjectOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Pattern;
+
+import Restaurante.ExcecaoLimiteAvaliacaoInvalida;
 import Restaurante.Pedido;
 
 public class Cliente implements Serializable {
@@ -49,7 +47,10 @@ public class Cliente implements Serializable {
         this.fidelidade = fidelidade;
     }
 
-
+    /**
+     * Finaliza o pedido
+     * @param pedido Pedido que está sendo realizado
+     */
     public void realizarPedido(Pedido pedido) {
         verificarFidelidadeCliente();
         
@@ -60,20 +61,28 @@ public class Cliente implements Serializable {
         pedidos.add(pedido);
     }
 
-    public Pedido avaliarPedido(Pedido pedido) {
-        Scanner sc = new Scanner(System.in);
-        int avaliacao;
+    /**
+     * Realiza uma avaliação no pedido que está sendo concluído 
+     * @param pedido Pedido que está sendo concluído
+    */
+    public void avaliarPedido(Pedido pedido) {
+        try {
+            Scanner sc = new Scanner(System.in);
+            int avaliacao;
 
-        do {
-            System.out.print("Digite a nota da sua avaliação (Entre 1 e 5):");
-            avaliacao = sc.nextInt();
-        } while(avaliacao <= 0 && avaliacao > 5);
+            do {
+                System.out.print("Digite a nota da sua avaliação (Entre 1 e 5):");
+                avaliacao = sc.nextInt();
+            } while(avaliacao <= 0 && avaliacao > 5);
 
-        pedido.setAvaliacao(avaliacao);
-
-        return pedido;
+            pedido.setAvaliacao(avaliacao);
+        } catch (ExcecaoLimiteAvaliacaoInvalida e) {
+            System.err.println(e.getMessage());
+        }
     }
-
+    /**
+     * Obtem a fidelidade do cliente e atribui o valor para a propriedade fidelidade
+    */
     public void verificarFidelidadeCliente() {
         Fidelidade fidelidadeCliente = FidelidadeCliente.getInstancia().obterFidelidade(pedidos);
         if (!fidelidade.equals(fidelidadeCliente)) {
@@ -81,13 +90,19 @@ public class Cliente implements Serializable {
         }
     } 
     
-    public Pedido obterDescontoNoPedidoPorFidelidade(Pedido pedido) {
+    /**
+     * Obtem um desconto a partir do nível de fidelidade do cliente
+     * @param pedido Pedido que o cliente está realizando
+    */
+    public void obterDescontoNoPedidoPorFidelidade(Pedido pedido) {
         double novoValorPedido = pedido.getValorTotalPedido() - getFidelidade().getDesconto();
         pedido.setValorComDesconto(novoValorPedido);
-        
-        return pedido;
     }
 
+    /**
+     * Obtem a avaliação média dos pedidos que o cliente já avaliou
+     * @return Média de avaliações
+     */
     public double obterAvaliacaoMedia() {
         return pedidos.stream()
             .mapToDouble((pedido) -> pedido.getAvaliacao())

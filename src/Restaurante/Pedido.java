@@ -8,21 +8,12 @@ import Consumidor.Cliente;
 import Utils.StringUtils;
 
 public class Pedido implements Serializable {
+    private static int id = 1;
     private List<Produto> produtos;
     private int avaliacao;
-
     private Cliente cliente;
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    private static int id = 0;
     private LocalDateTime dataRealizacao;
     private double valorComDesconto;
-
-    public double getValorComDesconto() {
-        return valorComDesconto;
-    }
 
     public Pedido(List<Produto> produtos, Cliente cliente) {
         Pedido.id++;
@@ -32,6 +23,18 @@ public class Pedido implements Serializable {
         this.avaliacao = 0;
     }
 
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public double getValorComDesconto() {
+        return valorComDesconto;
+    }
+
+    /**
+     * Obtem o valor total do pedido
+     * @return Valor total do pedido
+     */
     public double getValorTotalPedido() {
         return produtos.stream().mapToDouble((produto) -> produto.getPreco()).sum();
     }
@@ -48,9 +51,12 @@ public class Pedido implements Serializable {
         return avaliacao;
     }
 
-    public void setAvaliacao(int avaliacao) {
+    public void setAvaliacao(int avaliacao) throws ExcecaoLimiteAvaliacaoInvalida {
         if (avaliacao > 0 && avaliacao < 5) {
             this.avaliacao = avaliacao;
+        } 
+        else {
+            throw new ExcecaoLimiteAvaliacaoInvalida();
         }
     }
 
@@ -62,8 +68,7 @@ public class Pedido implements Serializable {
         return id;
     }
 
-    @Override
-    public String toString() {
+    public String gerarNotaDeCompra() {
         String valorTotalPedidoFormatado = StringUtils.formatarNumeroParaStringEmFormatoDeMoedaBrasileira(getValorTotalPedido());
         String valorFinalPedidoComDescontoFormatado = StringUtils.formatarNumeroParaStringEmFormatoDeMoedaBrasileira(getValorComDesconto());
 
