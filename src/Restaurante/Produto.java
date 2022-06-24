@@ -1,8 +1,12 @@
 package Restaurante;
+
+import java.io.Serializable;
+
 /*
  * Classe genérica para representar qualquer produto do restaurante que se tornará um item de pedido
  */
-public abstract class Produto {
+public class Produto implements Serializable{
+    private static final long serialVersionUID = 1L;
     private String descricao;
     private double preco;
     public Produto(String descricao, double preco){
